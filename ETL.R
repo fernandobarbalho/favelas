@@ -233,8 +233,33 @@ municipios_cor_raca_trabalho<-
     cor_raca = D4N
   )
 
-
 saveRDS(municipios_cor_raca_trabalho, "municipios_cor_raca_trabalho.rds")
+
+municipios_cor_raca_perc<-
+  get_sidra(x = 9605,
+            #variable = c(11601,1607,11602), #12607 (número índice com ajustes sazonal), 11601 mês/mês anterior com ajustes sazonal, 11602 mês/mesmo mês do ano anterior 
+            variable = 1000093,
+            period = c("2022"),
+            #period = c("last" = 12),
+            geo = "City",
+            #geo.filter = list("City"= 2304400),
+            classific = c("C86"),
+            category =  list(c(2776:2780)), #, 72118,72119, 12046
+            header = FALSE,
+            format = 3)
+
+municipios_cor_raca_perc_trabalho<-
+  municipios_cor_raca_perc %>%
+  select(c(4:6,9)) %>%
+  rename(
+    percentual = V,
+    cod_ibge = D1C,
+    municipio = D1N,
+    cor_raca = D4N
+  )
+
+saveRDS(municipios_cor_raca_perc_trabalho, "municipios_cor_raca_perc_trabalho.rds")
+
 
 
 
