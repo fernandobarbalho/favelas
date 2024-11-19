@@ -151,6 +151,28 @@ dados_favela_municipios<-
   )%>%
   filter(cor_raca %in% c("Branca", "Preta", "Parda"))  
 
+
+favela_municipio_fake<- tibble(municipio = 1:100, favela= 1:100)
+
+favela_municipio_fake %>%
+  ggplot()aes(x=municipio, y=favela)+
+  geom_smooth(method = "lm")
+
+
+dados_favela_municipios %>%
+  select(-municipio) %>%
+  pivot_wider(names_from = agrupamento, values_from = percentual) %>%
+  ggplot(aes(x=municipio, y=favela)) +
+  geom_point( aes(fill = cor_raca), pch= 21, color = "black")+
+  geom_smooth(data=favela_municipio_fake,method = "lm", color = "yellow", linetype = "dashed") +
+  scale_fill_discrete_qualitative(palette = "Dark 2") +
+  theme_light() +
+  theme(
+    panel.grid =  element_blank() ,
+    panel.background = element_rect(fill = "black")
+  )
+
+
 dados_favela_municipios %>%
   ggplot(aes(x= cor_raca, y= percentual)) +
   geom_boxplot() +
@@ -163,6 +185,41 @@ mapa_favela_municipio_cor_seat<-
     dados_favela_municipios %>%
       mutate(code_muni= as.numeric(cod_ibge)) 
   )
+
+
+mapa_favela_municipio_cor_seat_dif <-
+  mapa_municipios_seat %>%
+  inner_join(
+    dados_favela_municipios %>%
+      select(-municipio) %>%
+      pivot_wider(names_from = agrupamento, values_from = percentual) %>%
+      mutate(diferenca = municipio-favela) %>%
+      mutate(code_muni= as.numeric(cod_ibge)) 
+  )
+
+
+mapa_favela_municipio_cor_seat_dif %>%
+  ggplot() +
+  geom_sf(data = mapa_estados, fill = NA) +
+  geom_sf(aes( fill = diferenca, size = abs(diferenca)), pch = 21, alpha = 1, color = "black"  ) +
+  scale_fill_continuous_divergingx(palette = "RdBu") +
+  theme_void() +
+  theme(
+    panel.background = element_rect(fill = "black"),
+    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    strip.background = element_rect(fill = "black"),
+    strip.text = element_text(color = "white")
+  ) +
+  facet_wrap(cor_raca~.) +
+  labs(
+    title =  "Cor/raça nas favelas brasileiras",
+    subtitle =  "Dados do Censo de 2022",
+    fill = "%",
+    caption = "Fonte: IBGE. Elaboração própria"
+  )
+
+
 
 mapa_favela_municipio_cor_seat %>%
   filter(cor_raca== "Branca") %>%
@@ -298,7 +355,7 @@ mapa_favela_municipio_cor_seat %>%
   mutate(agrupamento = factor(agrupamento, levels = c("municipio", "favela"))) %>%
   ggplot() +
   #geom_sf(data = mapa_estados, fill = NA) +
-  geom_sf(aes( fill = percentual, size = percentual), pch = 21  ) +
+  geom_sf(aes( fill = percentual, size = percentual), pch = 21, alpha=0.5  ) +
   scale_fill_continuous_sequential(palette= "Heat 2") +
   theme_void() +
   theme(
@@ -373,7 +430,7 @@ mapa_favela_municipio_cor_seat %>%
   mutate(agrupamento = factor(agrupamento, levels = c("municipio", "favela"))) %>%
   ggplot() +
   #geom_sf(data = mapa_estados, fill = NA) +
-  geom_sf(aes( fill = percentual, size = percentual), pch = 21  ) +
+  geom_sf(aes(  size = percentual), pch = 21, alpha=0.5, fill= "white"  ) +
   scale_fill_continuous_sequential(palette= "Heat 2") +
   theme_void() +
   theme(
