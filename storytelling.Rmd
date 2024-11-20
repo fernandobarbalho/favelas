@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
 
 library(tidyverse)
 library(colorspace)
+library(patchwork)
 
 favelas_cor_trabalho <- readRDS("~/Github/favelas/favelas_cor_trabalho.rds")
 municipios_cor_raca_perc_trabalho <- readRDS("~/Github/favelas/municipios_cor_raca_perc_trabalho.rds")
@@ -47,20 +48,30 @@ dados_favela_municipios %>%
   pivot_wider(names_from = agrupamento, values_from = percentual) %>%
   ggplot(aes(x=municipio, y=favela)) +
   geom_point( aes(fill = cor_raca), pch= 21, color = "black")+
+  geom_point( aes(x = 76.34, y= 28.06), pch= 21, color = "black", fill = "#c87a8a", size =4 )+
+  geom_point( aes(x = 76.19, y= 89.22), pch= 21, color = "black", fill = "#6b9d59", size =4 )+
   geom_smooth(data=favela_municipio_fake,method = "lm", color = "yellow", linetype = "dashed") +
+  geom_text(aes(x = 90, y= 28.06 , label = str_wrap("Coronel Freitas-SC: 76% da população geral se identifica como branca, enquanto esse percentual chega a 28% entre os moradores de favelas",25)), color = "#c87a8a") +
+  geom_text(aes(x = 40, y= 92 , label = str_wrap("Maués-AM: 76% da população geral se identifica como parda, enquanto esse percentual chega a 89% entre os moradores de favelas",80)), color = "#6b9d59") +
   scale_fill_discrete_qualitative(palette = "Dark 2") +
   theme_light() +
   theme(
     panel.grid =  element_blank() ,
     panel.background = element_rect(fill = "black"),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 14),
+  
   ) +
   labs(
-    title = "Populações pretas e pardas habitam em favelas em proporções maiores do que a esperada",
-    subtitle = "Cada ponto é um município",
-    x= "Proporção da população do município por cor/raça",
-    y= "Proporção da população em favelas por cor/raça "
+    title = "Desigualdades Raciais em Favelas e Municípios Brasileiros",
+    subtitle = "Relação entre a composição racial da população geral e a dos moradores de favelas",
+    x= "Proporção da população do município por cor/raça (%)",
+    y= "Proporção da população em favelas por cor/raça (%)",
+    fill = "cor/raça",
+    caption = "Fonte: IBGE (censo 2022). Elaboração: Fernando Barbalho"
   )
 
+ggsave( filename =  "grafico_dispersao.png")
 ```
 
 ```{r fig.height=14, fig.width=18, fig.dpi= 300}
@@ -76,7 +87,7 @@ mapa_favela_municipio_cor_seat_dif <-
 
 
 mapa_favela_municipio_cor_seat_dif %>%
-  #filter(cor_raca %in% c("Branca", "Parda")) %>%
+  #filter(cor_raca %in% c("Branca")) %>%
   ggplot() +
   geom_sf(data = mapa_estados, fill = NA) +
   geom_sf(aes( fill = diferenca, size = abs(diferenca)), pch = 21, alpha = 1, color = "black"  ) +
@@ -84,21 +95,22 @@ mapa_favela_municipio_cor_seat_dif %>%
   theme_void() +
   theme(
     panel.background = element_rect(fill = "black"),
-    plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
-    plot.subtitle = element_text(hjust = 0.5, size = 12),
+    plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+    plot.subtitle = element_text(hjust = 0.5, size = 14),
     strip.background = element_rect(fill = "black"),
-    strip.text = element_text(color = "white")
+    strip.text = element_text(color = "white", size = 14, face = "bold" )
   ) +
   facet_wrap(cor_raca~.) +
   labs(
-    title =  "Cor/raça nas favelas brasileiras",
+    title =  "Desigualdades Raciais em Favelas e Municípios Brasileiros",
     subtitle =  "Diferença entre proporção população município e proporção população favelas",
-    fill = "",
+    fill = "Diferença",
     size = "Diferença",
-    caption = "Fonte: IBGE (censo 2022). Elaboração própria"
+    caption = "Fonte: IBGE (censo 2022). Elaboração: Fernando Barbalho"
   )
 
-ggsave(filename = "mapa.jpg",height = 14, width = 18,  dpi = 300)
+
+ggsave(filename = "mapa_2.jpg",height = 14, width = 18,  dpi = 300)
 
 ```
 
