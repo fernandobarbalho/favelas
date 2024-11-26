@@ -114,3 +114,126 @@ ggsave(filename = "mapa_2.jpg",height = 14, width = 18,  dpi = 300)
 
 ```
 
+
+## Acréscimos
+
+
+```{r}
+dados_triangulos <- 
+  left_join(
+    favelas_cor_trabalho %>%
+      select(cod_ibge, cor_raca, y = percentual),
+    municipios_cor_raca_perc_trabalho %>%
+      select(cod_ibge, cor_raca, x = percentual),
+    by = c("cod_ibge", "cor_raca")
+  ) %>%
+  filter(cor_raca %in% c("Branca", "Preta", "Parda")) %>%
+  mutate(
+    uf = str_sub(cod_ibge, 1, 2),
+    regiao = str_sub(uf, 1, 1)
+  ) %>%
+  arrange(cod_ibge, cor_raca)
+```
+
+```{r}
+plota_triangulo1 <- function(regs = 1:5, rows = round(sum(c(7, 9, 5, 3, 4)[regs])^(1/3))) {
+  dados_triangulos %>%
+    filter(regiao %in% regs) %>%
+    ggplot() +
+    aes(x, y, group = cod_ibge) +
+    coord_fixed() +
+    geom_polygon(fill = NA, color = "white") +
+    geom_point(aes(fill = cor_raca), pch = 21, size = if (rows <= 2) 1 else .8, color = "black") +
+    facet_wrap(~ uf, nrow = rows) +
+    scale_fill_discrete_qualitative(palette = "Dark 2") +
+    theme_light() +
+    xlim(0,100) + 
+    ylim(0,100) + 
+    theme(
+      panel.grid =  element_blank() ,
+      panel.background = element_rect(fill = "black"),
+      plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+      plot.subtitle = element_text(hjust = 0.5, size = 14),
+    ) +
+    labs(
+      title = "Desigualdades Raciais em Favelas e Municípios Brasileiros",
+      subtitle = "Relação entre a composição racial da população geral e a dos moradores de favelas",
+      x = "Proporção da população do município por cor/raça (%)",
+      y = "Proporção da população em favelas por cor/raça (%)",
+      fill = "cor/raça",
+      caption = "Fonte: IBGE (censo 2022). Elaboração: Fernando Barbalho"
+    )
+}
+```
+
+
+```{r fig.height=6, fig.width=10, fig.dpi= 300}
+plota_triangulo1()
+# ggsave( filename =  "triangulo1_br.png")
+plota_triangulo1(1)
+# ggsave( filename =  "triangulo1_1.png")
+plota_triangulo1(2)
+# ggsave( filename =  "triangulo1_2.png")
+plota_triangulo1(3, 1)
+# ggsave( filename =  "triangulo1_3.png")
+plota_triangulo1(4)
+# ggsave( filename =  "triangulo1_4.png")
+plota_triangulo1(5, 1)
+# ggsave( filename =  "triangulo1_5.png")
+```
+
+
+```{r}
+plota_triangulo2 <- function(regs = 1:5, rows = round(sum(c(7, 9, 5, 3, 4)[regs])^(1/3))) {
+  dados_triangulos %>%
+    filter(regiao %in% regs) %>%
+    ggplot() +
+    aes(x, y, group = cod_ibge) +
+    coord_fixed() +
+    geom_polygon(aes(color = cod_ibge), fill = NA, linewidth = .5) +
+    geom_point(
+      data = 
+        dados_triangulos %>% 
+        filter(
+          regiao %in% regs, 
+          cor_raca == "Parda"
+        ),
+      size = if (rows <= 2) 1 else .8, 
+      color = "gray"
+    ) +
+    facet_wrap(~ uf, nrow = rows) +
+    scale_color_discrete_qualitative(palette = "Dark 2", guide = "none") +
+    theme_light() +
+    xlim(0,100) + 
+    ylim(0,100) + 
+    theme(
+      panel.grid =  element_blank() ,
+      panel.background = element_rect(fill = "black"),
+      plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+      plot.subtitle = element_text(hjust = 0.5, size = 14),
+    ) +
+    labs(
+      title = "Desigualdades Raciais em Favelas e Municípios Brasileiros",
+      subtitle = "Relação entre a composição racial da população geral e a dos moradores de favelas",
+      x = "Proporção da população do município por cor/raça (%)",
+      y = "Proporção da população em favelas por cor/raça (%)",
+      fill = "cor/raça",
+      caption = "Fonte: IBGE (censo 2022). Elaboração: Fernando Barbalho"
+    )
+}
+```
+
+```{r fig.height=6, fig.width=10, fig.dpi= 300}
+plota_triangulo2()
+# ggsave( filename =  "triangulo2_br.png")
+plota_triangulo2(1)
+# ggsave( filename =  "triangulo2_1.png")
+plota_triangulo2(2)
+# ggsave( filename =  "triangulo2_2.png")
+plota_triangulo2(3, 1)
+# ggsave( filename =  "triangulo2_3.png")
+plota_triangulo2(4)
+# ggsave( filename =  "triangulo2_4.png")
+plota_triangulo2(5, 1)
+# ggsave( filename =  "triangulo2_5.png")
+```
