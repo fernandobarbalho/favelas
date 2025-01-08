@@ -447,3 +447,23 @@ mapa_favela_municipio_cor_seat %>%
     fill = "%",
     caption = "Fonte: IBGE. Elaboração própria"
   )
+
+
+dados_favela_municipios %>%
+  select(-municipio) %>%
+  pivot_wider(names_from = agrupamento, values_from = percentual) %>%
+  mutate(diferenca = municipio -  favela) %>%
+  filter(cor_raca == "Branca",
+         diferenca <0) %>% 
+  select(cod_ibge) %>%
+  inner_join(
+    favelas_cor_trabalho %>%
+      distinct(cod_ibge, municipio) %>%
+      mutate(uf = str_sub(municipio, str_length(municipio)-1,str_length(municipio)))
+  ) %>%
+  summarise( quantidade = n(),
+             .by = uf) %>%
+  arrange(desc(quantidade))
+  
+
+
