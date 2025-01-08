@@ -11,6 +11,8 @@ mapa_municipios<- geobr::read_municipality()
 
 mapa_municipios_seat<- geobr::read_municipal_seat()
 
+geobr::read_census_tract()
+
 
 ############### Número de Favelas por cidade brasileira
 
