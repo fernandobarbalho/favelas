@@ -261,7 +261,12 @@ municipios_cor_raca_perc_trabalho<-
 saveRDS(municipios_cor_raca_perc_trabalho, "municipios_cor_raca_perc_trabalho.rds")
 
 
+municipios_cor_raca_perc_trabalho%>%
+  readr::write_csv("municipios_cor_raca_perc_trabalho.csv")
 
+
+favelas_cor_trabalho %>%
+  readr::write_csv("favelas_cor_trabalho.csv")
 
 ##############Esses códigos abaixo resultaram em análises pouco produtivas.
 # favela_perc_cor_raca_mun<-
